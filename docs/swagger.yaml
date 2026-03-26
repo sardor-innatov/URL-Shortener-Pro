@@ -1,0 +1,372 @@
+basePath: /api/v1
+definitions:
+  auth_dto.LogInDto:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  auth_dto.RefreshTokenDto:
+    properties:
+      role:
+        type: string
+    type: object
+  auth_dto.SignUpDto:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      password:
+        type: string
+    type: object
+  dto.LinkCreateDto:
+    properties:
+      customAlias:
+        maxLength: 32
+        minLength: 4
+        type: string
+      expiresIn:
+        type: integer
+      url:
+        type: string
+    required:
+    - url
+    type: object
+  dto.RoleCreateDto:
+    properties:
+      permissions:
+        $ref: '#/definitions/helper.JsonObject'
+      roleName:
+        type: string
+    type: object
+  dto.UserRoleCreate:
+    properties:
+      roleId:
+        type: integer
+      userId:
+        type: integer
+    type: object
+  helper.JsonObject:
+    additionalProperties: {}
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  title: URL Shortener Pro API
+  version: "1.0"
+paths:
+  /{shortCode}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: shortCode
+        in: path
+        name: shortCode
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "302":
+          description: Found
+      summary: redirect
+      tags:
+      - link
+  /auth:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: auth
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/auth_dto.SignUpDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: sign up
+      tags:
+      - auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: auth
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/auth_dto.LogInDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: login
+      tags:
+      - auth
+  /auth/me:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: get my profile
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: auth
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/auth_dto.RefreshTokenDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: refresh token
+      tags:
+      - auth
+  /link/{id}/stats:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: id
+        format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: get stats about link
+      tags:
+      - stats
+  /link/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: id
+        format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      security:
+      - ApiKeyAuth: []
+      summary: delete link
+      tags:
+      - link
+  /link/my:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: get link by user id
+      tags:
+      - link
+  /link/shorten:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LinkCreateDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: create short link
+      tags:
+      - link
+  /role:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: get all
+      tags:
+      - role
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: role
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RoleCreateDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: create
+      tags:
+      - role
+  /role/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: id
+        format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: delete
+      tags:
+      - role
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: id
+        format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: get by id
+      tags:
+      - role
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: id
+        format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: role
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RoleCreateDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: update
+      tags:
+      - role
+  /role/give:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: dto
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserRoleCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: give role
+      tags:
+      - role
+  /role/permissions:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: get all
+      tags:
+      - role
+securityDefinitions:
+  ApiKeyAuth:
+    description: 'Введите токен в формате: Bearer <your_token>'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
